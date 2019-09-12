@@ -1,0 +1,201 @@
+tl
+
+Handler.java
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package handlers;
+
+import java.sql.Timestamp;
+
+
+/**
+ *
+ * @author kenca
+ */
+public class Handler {
+
+    /**
+     *
+     */
+
+    private String default_app_name="Kodi";
+    private String default_app_path="/Applications/"+default_app_name+".app";
+
+
+    /**
+    * 0 = ouput to be computed
+    * 1 = Optional message for logging
+    */
+    public String[] output = new String[1];
+
+    public Handler(){
+
+    }
+
+
+    public String getLog(int level){
+        return log_status[level];
+    }
+    public void test(){
+        System.err.println("hello");
+    };
+    public String getTime(){
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+        return String.valueOf(timestamp)+" - ";
+    }
+
+
+}
+
+
+______
+
+LogMessages.java
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package handlers;
+
+/**
+ *
+ * @author kenca
+ */
+public class LogMessages {
+
+    public String[] log_status = new String[50];
+
+    public LogMessages() {
+      // General statement
+      log_status[0] = "Closing application\n";
+      log_status[1] = "Starting application\n";
+      // Kodi related path details
+      log_status[10] = "Default Kodi path not found in /Applications/";
+      log_status[11] = "Please provide a path where the Kodi app is located.";
+      log_status[12] = "Default path located";
+      log_status[13] = "Default path has not been located. Installation of the app is recommended before conversion.";
+      // Existing message
+      log_status[49] = "Goodbye\n";
+    }
+    public String[] getKodiPath(){
+      String app_path_found="";
+      try {
+        // Execute command
+        String command = "mdfind 'kMDItemContentType == \"com.apple.application-bundle\" && kMDItemFSName = \""+default_app_name+"\"' | head -n 1";
+        Process process = Runtime.getRuntime().exec(command);
+
+        // Get the input stream and read from it
+        InputStream in = process.getInputStream();
+        int c;
+        // Output the path if is default. Double check if it's actually default.
+        while ((c = in.read()) != -1) {
+          String client_path = process((char)c);
+          if(client_path.equals(default_app_path)){
+            app_path_found=client_path;
+            lm.returnOuput()=app_path_found;
+            lm.returnMessage()=log_status[12];
+          }
+        }
+            in.close();
+        } catch (IOException e) {
+            LOGGER.error("Exception encountered", e);
+        }
+        return output;
+    }
+
+}
+
+______
+
+Configuration.java
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package handlers;
+
+/**
+ *
+ * @author kenca
+ */
+public class Configuration {
+
+    private Handler
+    private boolean simplify_exit=false;
+    private boolean simplify_navigation=false;
+    private boolean remove_settings=false;
+    private String default_library="";
+    private boolean password_protection=false;
+    private String password="123";
+    private LogMessages lm = new LogMessages();
+
+    public Configuration(boolean simplify_exit,boolean simplify_navigation,boolean remove_settings,String default_library,boolean password_protection,String password) {
+        this.simplify_exit=simplify_exit;
+        this.simplify_navigation=simplify_navigation;
+        this.remove_settings=remove_settings;
+        this.default_library=default_library;
+        this.password_protection=password_protection;
+        this.password=password;
+    }
+
+    public boolean isSimplify_exit() {
+        return simplify_exit;
+    }
+
+    public boolean isSimplify_navigation() {
+        return simplify_navigation;
+    }
+
+    public boolean isRemove_settings() {
+        return remove_settings;
+    }
+
+    public String getDefault_library() {
+        return default_library;
+    }
+
+    public boolean isPassword_protection() {
+        return password_protection;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String[] getKodiPath(){
+      String app_path_found="";
+      try {
+        // Execute command
+        String command = "mdfind 'kMDItemContentType == \"com.apple.application-bundle\" && kMDItemFSName = \""+default_app_name+"\"' | head -n 1";
+        Process process = Runtime.getRuntime().exec(command);
+
+        // Get the input stream and read from it
+        InputStream in = process.getInputStream();
+        int c;
+        // Output the path if is default. Double check if it's actually default.
+        while ((c = in.read()) != -1) {
+          String client_path = process((char)c);
+          if(client_path.equals(default_app_path)){
+            app_path_found=client_path;
+            lm.returnOuput()=app_path_found;
+            lm.returnMessage()=log_status[12];
+          }
+        }
+            in.close();
+        } catch (IOException e) {
+            LOGGER.error("Exception encountered", e);
+        }
+        return output;
+    }
+
+}
+
+______
